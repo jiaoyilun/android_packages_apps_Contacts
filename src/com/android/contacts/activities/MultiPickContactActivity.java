@@ -110,6 +110,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import com.a1os.cloud.phone.PhoneUtil;
+import android.suda.utils.SudaUtils;
+
 public class MultiPickContactActivity extends ListActivity implements
         TextView.OnEditorActionListener, View.OnTouchListener,
         SearchView.OnQueryTextListener, SearchView.OnCloseListener,
@@ -1334,7 +1337,7 @@ public class MultiPickContactActivity extends ListActivity implements
                 String callerName = cursor.getString(CALLLOG_COLUMN_CALLER_NAME);
                 int callerNumberType = cursor.getInt(CALLLOG_COLUMN_CALLER_NUMBERTYPE);
                 String callerNumberLabel = cursor.getString(CALLLOG_COLUMN_CALLER_NUMBERLABEL);
-                String geocodedLocation = cursor.getString(CALLLOG_COLUMN_CALLER_LOCATION);
+                String geocodedLocation = PhoneUtil.getPhoneUtil(MultiPickContactActivity.this).getLocalNumberInfo(cache.number);
                 String accountId = cursor.getString(CALLLOG_COLUMN_PHONE_ACCOUNT);
                 long date = cursor.getLong(CALLLOG_COLUMN_DATE);
                 long duration = cursor.getLong(CALLLOG_COLUMN_DURATION);
@@ -1378,8 +1381,10 @@ public class MultiPickContactActivity extends ListActivity implements
 
                 CharSequence numberLabel = null;
                 if (callerNumberType != 0 && !PhoneNumberUtils.isUriNumber(cache.number)) {
-                    numberLabel = Phone.getDisplayLabel(context, callerNumberType,
-                            callerNumberLabel);
+                    numberLabel = SudaUtils.isSupportLanguage(true) ? TextUtils.isEmpty(geocodedLocation) ? Phone.getDisplayLabel(context, callerNumberType,
+                            callerNumberLabel) : Phone.getDisplayLabel(context, callerNumberType,
+                                    callerNumberLabel) + " " + geocodedLocation : Phone.getDisplayLabel(context, callerNumberType,
+                                            callerNumberLabel) ;
                 } else {
                     numberLabel = geocodedLocation;
                 }
